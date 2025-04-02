@@ -1,40 +1,47 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   StyleSheet,
   Text,
   View,
   TextInput,
   Pressable,
-  Vibration,
+  Image,
 } from "react-native";
+import Loading from "./src/components/Loading";
 
 export default function App() {
-  const [name, setName] = React.useState("");
-  const [number, setNumber] = React.useState("");
-  const [result, setResult] = React.useState("");
+  const [name, setName] = useState("");
+  const [number, setNumber] = useState("");
+  const [result, setResult] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   return (
     <View style={styles.container}>
-      <Text>Welcome {result}</Text>
-      <Text>Name</Text>
+      <Image
+        source={require("./assets/images/loginIcon.png")}
+        style={styles.image}
+      />
+      <Text style={styles.welcome}>Welcome {result}</Text>
+      <Text>Email</Text>
       <TextInput
+        inputMode="email"
         style={styles.textInputStyle}
-        placeholder="Enter Your Name"
+        placeholder="Enter Your Email"
         onChangeText={setName}
         value={name}
         autoCapitalize="none"
       />
-      <Text>Your Number</Text>
+      <Text>Password</Text>
       <TextInput
+        secureTextEntry={true}
         style={styles.textInputStyle}
-        placeholder="Enter Your Number"
-        keyboardType="phone-pad"
+        placeholder="Enter Your Password"
         onChangeText={setNumber}
         value={number}
       />
 
       <Pressable
-        onPress={() => setResult(name + " " + number)}
+        onPress={() => setIsLoading(true)}
         style={({ pressed }) => [
           { backgroundColor: pressed ? "lightblue" : "pink" },
           styles.button,
@@ -42,6 +49,8 @@ export default function App() {
       >
         <Text style={styles.buttonText}>Save</Text>
       </Pressable>
+
+      {isLoading ? <Loading setIsLoading={setIsLoading} /> : null}
     </View>
   );
 }
@@ -73,6 +82,14 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   buttonText: {
+    fontWeight: "bold",
+    fontSize: 20,
+  },
+  image: {
+    width: 120,
+    height: 120,
+  },
+  welcome: {
     fontWeight: "bold",
     fontSize: 20,
   },
