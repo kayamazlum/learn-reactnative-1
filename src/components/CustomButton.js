@@ -28,11 +28,11 @@ export default CustomButton;
 
 const styles = StyleSheet.create({
   button: {
-    height: 50,
+    height: 40,
     borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 20,
+    marginTop: 10,
   },
   buttonText: {
     fontWeight: "bold",
