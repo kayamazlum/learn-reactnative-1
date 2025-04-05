@@ -4,7 +4,7 @@ import AuthStack from "./AuthStack";
 import UserStack from "./UserStack";
 
 const rootNavigation = () => {
-  const isAuth = true;
+  const isAuth = false;
 
   return (
     <NavigationContainer>
