@@ -14,7 +14,6 @@ import CustomButton from "../components/CustomButton";
 const HomePage = () => {
   const [data, setData] = useState([]);
   const [updateTheData, setUpdateTheData] = useState("");
-  console.log(data);
 
   useEffect(() => {
     getData();

@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View, Image } from "react-native";
 import { Loading, CustomTextInput, CustomButton } from "../components";
 import { useSelector, useDispatch } from "react-redux";
-import { setIsLoading, login } from "../redux/userSlice";
+import { setIsLoading, login, autoLogin } from "../redux/userSlice";
 
 const LoginPage = ({ navigation }) => {
   const [email, setEmail] = useState("");
@@ -12,6 +12,10 @@ const LoginPage = ({ navigation }) => {
 
   // userSlice içerisindeki reducer yapılarını kullanma veya veri gönderme
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(autoLogin());
+  }, []);
 
   return (
     <View style={styles.container}>
