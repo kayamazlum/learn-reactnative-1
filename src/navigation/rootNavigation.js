@@ -10,7 +10,7 @@ const rootNavigation = () => {
 
   return (
     <NavigationContainer>
-      {!isAuth ? <AuthStack /> : <UserStack />}
+      {isAuth ? <UserStack /> : <AuthStack />}
     </NavigationContainer>
   );
 };

@@ -3,7 +3,7 @@ import React from "react";
 
 const CustomButton = ({
   title,
-  width,
+  flex,
   onPress,
   buttonColor,
   pressedButtonColor,
@@ -14,7 +14,7 @@ const CustomButton = ({
       style={({ pressed }) => [
         {
           backgroundColor: pressed ? pressedButtonColor : buttonColor,
-          width: width,
+          flex: flex,
         },
         styles.button,
       ]}
@@ -29,10 +29,9 @@ export default CustomButton;
 const styles = StyleSheet.create({
   button: {
     height: 40,
-    borderRadius: 10,
+    borderRadius: 15,
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 10,
   },
   buttonText: {
     fontWeight: "bold",

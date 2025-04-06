@@ -1,6 +1,12 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import {
+  getAuth,
+  signOut,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+} from "firebase/auth";
 
 export const login = createAsyncThunk(
   "user/login",
@@ -32,6 +38,7 @@ export const login = createAsyncThunk(
   }
 );
 
+// Kullanıcı otomatik giriş işlemleri
 export const autoLogin = createAsyncThunk("user/autoLogin", async () => {
   try {
     const token = await AsyncStorage.getItem("userToken");
@@ -41,9 +48,45 @@ export const autoLogin = createAsyncThunk("user/autoLogin", async () => {
       throw new Error("User Not Found");
     }
   } catch (error) {
-    console.log(error);
+    throw error;
   }
 });
+
+// Kullanıcı Çıkış İşlemleri
+export const logout = createAsyncThunk("user/logout", async () => {
+  try {
+    const auth = getAuth();
+
+    await signOut(auth);
+    await AsyncStorage.removeItem("userToken");
+    return null;
+  } catch (error) {
+    throw error;
+  }
+});
+
+// Kullanıcı kayıt işlemleri
+export const register = createAsyncThunk(
+  "user/register",
+  async ({ email, password }) => {
+    try {
+      const auth = getAuth();
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+
+      const user = userCredential.user;
+      const token = user.stsTokenManager.accessToken;
+      await sendEmailVerification(user);
+      await AsyncStorage.setItem("userToken", token);
+      return token;
+    } catch (error) {
+      throw error;
+    }
+  }
+);
 
 const initialState = {
   isLoading: false,
@@ -98,6 +141,33 @@ export const userSlice = createSlice({
         state.isLoading = false;
         state.isAuth = false;
         state.token = null;
+      })
+      .addCase(logout.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(logout.fulfilled, (state) => {
+        state.isLoading = false;
+        state.isAuth = false;
+        state.token = null;
+        state.error = null;
+      })
+      .addCase(logout.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(register.pending, (state) => {
+        state.isLoading = true;
+        state.isAuth = false;
+      })
+      .addCase(register.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isAuth = true;
+        state.action = action.payload;
+      })
+      .addCase(register.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isAuth = false;
+        state.error = "Invalid Email or Password";
       });
   },
 });
