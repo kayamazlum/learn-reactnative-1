@@ -1,5 +1,5 @@
-import { StyleSheet, Text, View } from "react-native";
-import React, { useState } from "react";
+import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import React, { useEffect, useState } from "react";
 import {
   collection,
   addDoc,
@@ -13,6 +13,12 @@ import CustomButton from "../components/CustomButton";
 
 const HomePage = () => {
   const [data, setData] = useState([]);
+  const [updateTheData, setUpdateTheData] = useState("");
+  console.log(data);
+
+  useEffect(() => {
+    getData();
+  }, []);
 
   // SEND DATA FOR FIREBASE
   const sendData = async () => {
@@ -30,25 +36,38 @@ const HomePage = () => {
 
   //GET DATA FROM FIREBASE
   const getData = async () => {
-    const querySnapshot = await getDocs(collection(db, "reactNativeLesson"));
-    querySnapshot.forEach((doc) => {
-      // console.log(`${doc.id} => ${doc.data()}`);
-      setData([...data, doc.data()]);
-    });
+    const allData = [];
+    try {
+      const querySnapshot = await getDocs(collection(db, "reactNativeLesson"));
+      querySnapshot.forEach((doc) => {
+        // console.log(`${doc.id} => ${doc.data()}`);
+        allData.push({ ...doc.data(), id: doc.id });
+      });
+      setData(allData);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   // DELETE DATA FROM FIREBASE
-  const deleteData = async () => {
-    await deleteDoc(doc(db, "reactNativeLesson", "hXNe0RE6DSM2rAcpc5HN"));
+  const deleteData = async (value) => {
+    try {
+      await deleteDoc(doc(db, "reactNativeLesson", value));
+      console.log("Delete Successfully");
+      getData();
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   // UPDATE DATA FROM FIREBASE
-  const updateData = async () => {
+  const updateData = async (value) => {
     try {
-      const lessonData = doc(db, "reactNativeLesson", "EqFJEJsd43z1esFENgKY");
+      const lessonData = doc(db, "reactNativeLesson", value);
       await updateDoc(lessonData, {
-        lesson: 102,
+        content: updateTheData,
       });
+      getData();
     } catch (error) {
       console.log(error);
     }
@@ -56,18 +75,37 @@ const HomePage = () => {
 
   return (
     <View style={styles.container}>
-      <Text>HomePage</Text>
-
-      <Text>{data.title}</Text>
-      <Text>{data.content}</Text>
-      <Text>{data.lesson}</Text>
+      <TextInput
+        placeholder="enter your data"
+        onChangeText={setUpdateTheData}
+        value={updateTheData}
+        style={{
+          borderWidth: 0.5,
+          paddingVertical: 5,
+          width: "80%",
+          marginBottom: 10,
+        }}
+      />
+      {data.map((value, index) => {
+        return (
+          <Pressable key={index} onPress={() => updateData(value.id)}>
+            <Text>{index}</Text>
+            <Text>{value.id}</Text>
+            <Text>{value.title}</Text>
+            <Text>{value.content}</Text>
+            <Text>{value.lesson}</Text>
+          </Pressable>
+        );
+      })}
 
       <CustomButton
         title={"Save"}
         width={"40%"}
         buttonColor={"pink"}
         pressedButtonColor={"gray"}
-        onPress={sendData}
+        onPress={() => {
+          sendData(), getData();
+        }}
       />
       <CustomButton
         title={"Get Data"}
